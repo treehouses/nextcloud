@@ -33,9 +33,9 @@ script:
   #- echo $flag
 - flag="true"
 before_deploy:
-- pull_image "nextcloud" arm v7
-- pull_image "nextcloud" amd64
-- pull_image "nextcloud" arm64
+- pull_image "nextcloud" arm treehouses v7
+- pull_image "nextcloud" amd64 treehouses
+- pull_image "nextcloud" arm64 treehouses
 - timetag=$(date +%Y%m%d%H%M)
 - echo $timetag
 - tag1="latest"
