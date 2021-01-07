@@ -111,6 +111,24 @@ build_image(){
   fi
 }
 
+pull_image(){
+  local repo=$1  # this is the base repo, for example treehouses/alpine
+  local arch=$2  #arm arm64 amd64
+  local tag_repo=$3  # this is the tag repo, for example treehouses/node
+  if [ $# -le 1 ]; then
+    echo "missing parameters."
+    exit 1
+  fi
+  sha=$(get_manifest_sha $@)
+  echo $sha
+  base_image="$repo@$sha"
+  echo $base_image
+  if [ -n "$sha" ]; then
+    tag=$tag_repo-tags:$arch
+    docker pull $base_image
+  fi
+}
+
 deploy_image(){
   local repo=$1
   local arch=$2  #arm arm64 amd64

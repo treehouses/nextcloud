@@ -27,14 +27,15 @@ script:
   #- echo $treehouses_nextcloud__arm64_sha
   #- flag_arm64=$(is_base "nextcloud@"$nextcloud_arm64_sha "treehouses/nextcloud@"$treehouses_nextcloud__arm64_sha)
   #- echo $flag_arm64
-  #- echo $DOCKERAPIKEY | docker login -u "sevenseas" --password-stdin
+- echo $DOCKERAPIKEY | docker login -u "sevenseas" --password-stdin
+- docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
   #- flag=$(compare "nextcloud@"$nextcloud_arm_sha "treehouses/nextcloud@"$treehouses_nextcloud_arm_sha "nextcloud@"$nextcloud_amd64_sha "treehouses/nextcloud@"$treehouses_nextcloud_amd64_sha "nextcloud@"$nextcloud_arm64_sha "treehouses/nextcloud@"$treehouses_nextcloud__arm64_sha)
   #- echo $flag
 - flag="true"
 before_deploy:
-- deploy_image "treehouses/nextcloud" arm
-- deploy_image "treehouses/nextcloud" amd64
-- deploy_image "treehouses/nextcloud" arm64
+- pull_image "nextcloud" arm v7
+- pull_image "nextcloud" amd64
+- pull_image "nextcloud" arm64
 - timetag=$(date +%Y%m%d%H%M)
 - echo $timetag
 - tag1="latest"
