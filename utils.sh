@@ -127,6 +127,7 @@ pull_image(){
   if [ -n "$sha" ]; then
     #tag=$tag_repo/$repo:$arch
     tag=$tag_repo-tags:$arch
+    echo $tag
     docker pull $base_image
     docker tag $base_image $tag
   fi
