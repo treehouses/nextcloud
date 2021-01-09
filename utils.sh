@@ -127,11 +127,12 @@ pull_image(){
   base_image="$repo@$sha"
   echo $base_image
   if [ -n "$sha" ]; then
-    #tag=$tag_repo/$repo:$arch
-    tag=$tag_repo-tags:$arch
+    tag1=$tag_repo:$arch
+    tag2=$tag_repo-tags:$arch
     echo $tag
     docker pull $base_image
-    docker tag $base_image $tag
+    docker tag $base_image $tag1
+    docker tag $base_image $tag2
   fi
 }
 
