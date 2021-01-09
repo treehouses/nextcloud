@@ -41,8 +41,8 @@ before_deploy:
 - tag1="latest"
 - tag2=$timetag
 - echo $tag2
-- create_manifest treehouses/nextcloud $tag1 $tag2 treehouses/nextcloud-tags:amd64 treehouses/nextcloud-tags:arm
-  treehouses/nextcloud-tags:arm64
+- create_manifest treehouses/nextcloud $tag1 $tag2 treehouses/nextcloud:amd64 treehouses/nextcloud:arm
+  treehouses/nextcloud:arm64
 - docker manifest inspect treehouses/nextcloud:$tag1
 - docker manifest inspect treehouses/nextcloud:$tag2
 deploy:
