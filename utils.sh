@@ -132,6 +132,8 @@ pull_image(){
   docker pull $base_image
   docker tag $base_image $tag1
   docker tag $base_image $tag2
+  echo $tag1
+  echo $tag2
 }
 
 deploy_image(){
