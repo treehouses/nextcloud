@@ -33,9 +33,9 @@ script:
   #- echo $flag
 - flag="true"
 before_deploy:
-- pull_image "arm32v7/nextcloud:stable" arm treehouses/nextcloud v7
-- pull_image "amd64/nextcloud:stable" amd64 treehouses/nextcloud
-- pull_image "arm64v8/nextcloud:stable" arm64 treehouses/nextcloud
+- pull_image "nextcloud:latest" arm treehouses/nextcloud v7
+- pull_image "nextcloud:latest" amd64 treehouses/nextcloud
+- pull_image "nextcloud:latest" arm64 treehouses/nextcloud
 - deploy_image "treehouses/nextcloud" arm
 - deploy_image "treehouses/nextcloud" arm64
 - deploy_image "treehouses/nextcloud" amd64
