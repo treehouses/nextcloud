@@ -1,0 +1,61 @@
+sudo: required
+addons:
+  apt:
+    update: true
+    packages:
+    - docker-ce
+services:
+- docker
+script:
+- export DOCKER_CLI_EXPERIMENTAL=enabled
+- source utils.sh
+  #- nextcloud_arm_sha=$(get_manifest_sha "nextcloud:latest" "arm" "v7")
+  #- echo $nextcloud_arm_sha
+  #- treehouses_nextcloud_arm_sha=$(get_manifest_sha "treehouses/nextcloud:latest" "arm")
+  #- echo $treehouses_nextcloud_arm_sha
+  #- flag_arm=$(is_base "nextcloud@"$nextcloud_arm_sha "treehouses/nextcloud@"$treehouses_nextcloud_arm_sha)
+  #- echo $flag_arm
+  #- nextcloud_amd64_sha=$(get_manifest_sha "nextcloud:latest" "amd64")
+  #- echo $nextcloud_amd64_sha
+  #- treehouses_nextcloud_amd64_sha=$(get_manifest_sha "treehouses/nextcloud:latest" "amd64")
+  #- echo $treehouses_nextcloud_amd64_sha
+  #- flag_amd64=$(is_base "nextcloud@"$nextcloud_amd64_sha "treehouses/nextcloud@"$treehouses_nextcloud_amd64_sha)
+  #- echo $flag_amd64
+  #- nextcloud_arm64_sha=$(get_manifest_sha "nextcloud:latest" "arm64")
+  #- echo $nextcloud_arm64_sha
+  #- treehouses_nextcloud__arm64_sha=$(get_manifest_sha "treehouses/nextcloud:latest" "arm64")
+  #- echo $treehouses_nextcloud__arm64_sha
+  #- flag_arm64=$(is_base "nextcloud@"$nextcloud_arm64_sha "treehouses/nextcloud@"$treehouses_nextcloud__arm64_sha)
+  #- echo $flag_arm64
+- echo $DOCKERAPIKEY | docker login -u "sevenseas" --password-stdin
+- docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  #- flag=$(compare "nextcloud@"$nextcloud_arm_sha "treehouses/nextcloud@"$treehouses_nextcloud_arm_sha "nextcloud@"$nextcloud_amd64_sha "treehouses/nextcloud@"$treehouses_nextcloud_amd64_sha "nextcloud@"$nextcloud_arm64_sha "treehouses/nextcloud@"$treehouses_nextcloud__arm64_sha)
+  #- echo $flag
+- flag="true"
+before_deploy:
+- pull_image "arm32v7/nextcloud:stable" arm treehouses/nextcloud v7
+- pull_image "amd64/nextcloud:stable" amd64 treehouses/nextcloud
+- pull_image "arm64v8/nextcloud:stable" arm64 treehouses/nextcloud
+- deploy_image "treehouses/nextcloud" arm
+- deploy_image "treehouses/nextcloud" arm64
+- deploy_image "treehouses/nextcloud" amd64
+- timetag=$(date +%Y%m%d%H%M)
+- echo $timetag
+- tag1="latest"
+- tag2=$timetag
+- echo $tag2
+- docker inspect treehouses/nextcloud:amd64
+- docker inspect treehouses/nextcloud:arm64
+- docker inspect treehouses/nextcloud:arm
+  #- create_manifests treehouses/nextcloud $tag1 $tag2 treehouses/nextcloud:amd64 treehouses/nextcloud:arm treehouses/nextcloud:arm64
+- create_manifests treehouses/nextcloud $tag1 $tag2 amd64/nextcloud:stable arm32v7/nextcloud:stable arm64v8/nextcloud:stable
+deploy:
+- provider: script
+  script: docker manifest push treehouses/nextcloud:$tag1; docker manifest push treehouses/nextcloud:$tag2
+  skip_cleanup: true
+  on:
+    all_branches: true
+    condition: "$flag = true"
+env:
+  global:
+    - secure:  OhS23OAZ+phO+AtONlKocarXKScCb3uFvmnEtGWulenhZL62QifMGpXx7Becv4kACkXNE1Iux9YQ6j/VwKBgRJ4egDGMoGRjoWpHojOquXO/5jsLf6jFZjL0qYzxJWX7PyG24RaHiG69dD34p/va1/cYIoNvK59NM7a8v3EpzPTO2Nx8ivsdIXKpteTqxWVvmNSVSWYuoYe0ESLTU/yNzosPfUKK96zoAEhkcndRmsoX29hx05y44c+0BaKaWLqu+pMzJoyN4jxxihtqgwy2delGAwnaNSwV7ut/dwsF9+NGoq63uQ56xjXQK0lAUpZiMMFUIAzQ31Bbuv2oCHvKsOdUeLFQYPdQEJowTMacUkU7uXL6vqscADNLL/kkQkcGJXJ1ISs3jGZEn93tGewvnvB/HdvnwCnNJUBtVHnV5A/i3Ot50whPg9/D7aA8slK6usLu3/E/DxLnatsNCJrEZ7PdLVxb59gGwyJLLXA/2i33CU9VMrExoLSGLo7kZYAVVAbNf4fCSE9Y27QRRmX/bBmgJVEiuJNwIA6IeTBhxGosF9KU59evzWYNVnxImY0j+fCFmSQxNZOiliV0b5w2LynRTHEbCzLkzWb7xA200GNRQQwcqj15uTqu/smhR6WD9V6FFYvbiuj4HhTDQ8PYTaQWYindgKq8iPXpC9FY4CQ=
