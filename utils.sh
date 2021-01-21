@@ -77,19 +77,25 @@ compare() {
 
 create_manifest() {
   local repo=$1
+  local tag=$2
+  local x86=$3
+  local rpi=$4
+  local arm64=$5
+  docker manifest create $repo:$tag $x86 $rpi $arm64
+  docker manifest annotate $repo:$tag $x86 --arch amd64
+  docker manifest annotate $repo:$tag $rpi --arch arm
+  docker manifest annotate $repo:$tag $arm64 --arch arm64
+}
+
+create_manifests() {
+  local repo=$1
   local tag1=$2
   local tag2=$3
   local x86=$4
   local rpi=$5
   local arm64=$6
-  docker manifest create $repo:$tag1 $x86 $rpi $arm64
-  docker manifest create $repo:$tag2 $x86 $rpi $arm64
-  docker manifest annotate $repo:$tag1 $x86 --arch amd64
-  docker manifest annotate $repo:$tag1 $rpi --arch arm
-  docker manifest annotate $repo:$tag1 $arm64 --arch arm64
-  docker manifest annotate $repo:$tag2 $x86 --arch amd64
-  docker manifest annotate $repo:$tag2 $rpi --arch arm
-  docker manifest annotate $repo:$tag2 $arm64 --arch arm64
+  create_manifest $repo $tag1 $x86 $rpi $arm64
+  create_manifest $repo $tag2 $x86 $rpi $arm64
 }
 
 build_image(){
@@ -111,6 +117,27 @@ build_image(){
   fi
 }
 
+pull_image(){
+  local repo=$1  # this is the base repo, for example treehouses/alpine
+  local arch=$2  #arm arm64 amd64
+  local tag_repo=$3  # this is the tag repo, for example treehouses/node
+  local version=$4
+  if [ $# -le 1 ]; then
+    echo "missing parameters."
+    exit 1
+  fi
+  sha=$(get_manifest_sha $repo $arch $version)
+  echo $sha
+  base_image="$repo@$sha"
+  echo $base_image
+  tag1=$tag_repo:$arch
+  tag2=$tag_repo-tags:$arch
+  docker pull $base_image
+  docker tag $base_image $tag1
+  docker tag $base_image $tag2
+  echo $tag1
+}
+
 deploy_image(){
   local repo=$1
   local arch=$2  #arm arm64 amd64
@@ -118,8 +145,8 @@ deploy_image(){
   tag_time=$(date +%Y%m%d%H%M)
   tag_arch_time=$repo-tags:$arch-$tag_time
   echo $tag_arch_time
+  docker push $repo:$arch
+  docker push $tag_arch
   docker tag $tag_arch $tag_arch_time
   docker push $tag_arch_time
-  docker tag $tag_arch_time $tag_arch
-  docker push $tag_arch
 }
