@@ -48,7 +48,6 @@ before_deploy:
 - docker inspect treehouses/nextcloud:arm64
 - docker inspect treehouses/nextcloud:arm
 - create_manifests treehouses/nextcloud $tag1 $tag2 treehouses/nextcloud:amd64 treehouses/nextcloud:arm treehouses/nextcloud:arm64
-  #- create_manifests treehouses/nextcloud $tag1 $tag2 amd64/nextcloud:stable arm32v7/nextcloud:stable arm64v8/nextcloud:stable
 deploy:
 - provider: script
   script: docker manifest push treehouses/nextcloud:$tag1; docker manifest push treehouses/nextcloud:$tag2
