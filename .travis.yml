@@ -31,7 +31,7 @@ script:
 - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 - flag=$(compare "nextcloud@"$nextcloud_arm_sha "treehouses/nextcloud@"$treehouses_nextcloud_arm_sha "nextcloud@"$nextcloud_amd64_sha "treehouses/nextcloud@"$treehouses_nextcloud_amd64_sha "nextcloud@"$nextcloud_arm64_sha "treehouses/nextcloud@"$treehouses_nextcloud__arm64_sha)
 - echo $flag
-- flag="true"
+#- flag="true"
 before_deploy:
 - pull_image "nextcloud:latest" arm treehouses/nextcloud v7
 - pull_image "nextcloud:latest" amd64 treehouses/nextcloud
