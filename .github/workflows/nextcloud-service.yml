@@ -10,55 +10,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Checks out a copy of your repository on the ubuntu-latest machine
-  - name: Checkout code
-    uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-  - name: docker login
-    run: docker login -u ${{ secrets.DOCKERUSERNAME }} -p ${{ secrets.DOCKERAPIKEY }}
-  - name: treehouses alpine
-    run: |
-      export DOCKER_CLI_EXPERIMENTAL=enabled
-      source utils.sh
-      nextcloud_arm_sha=$(get_manifest_sha "nextcloud:latest" "arm" "v7")
-      echo $nextcloud_arm_sha
-      treehouses_nextcloud_arm_sha=$(get_manifest_sha "treehouses/nextcloud:latest" "arm")
-      echo $treehouses_nextcloud_arm_sha
-      flag_arm=$(is_base "nextcloud@"$nextcloud_arm_sha "treehouses/nextcloud@"$treehouses_nextcloud_arm_sha)
-      echo $flag_arm
-      nextcloud_amd64_sha=$(get_manifest_sha "nextcloud:latest" "amd64")
-      echo $nextcloud_amd64_sha
-      treehouses_nextcloud_amd64_sha=$(get_manifest_sha "treehouses/nextcloud:latest" "amd64")
-      echo $treehouses_nextcloud_amd64_sha
-      flag_amd64=$(is_base "nextcloud@"$nextcloud_amd64_sha "treehouses/nextcloud@"$treehouses_nextcloud_amd64_sha)
-      echo $flag_amd64
-      nextcloud_arm64_sha=$(get_manifest_sha "nextcloud:latest" "arm64")
-      echo $nextcloud_arm64_sha
-      treehouses_nextcloud__arm64_sha=$(get_manifest_sha "treehouses/nextcloud:latest" "arm64")
-      echo $treehouses_nextcloud__arm64_sha
-      flag_arm64=$(is_base "nextcloud@"$nextcloud_arm64_sha "treehouses/nextcloud@"$treehouses_nextcloud__arm64_sha)
-      echo $flag_arm64
-      echo $DOCKERAPIKEY | docker login -u "sevenseas" --password-stdin
-      docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-      flag=$(compare "nextcloud@"$nextcloud_arm_sha "treehouses/nextcloud@"$treehouses_nextcloud_arm_sha "nextcloud@"$nextcloud_amd64_sha "treehouses/nextcloud@"$treehouses_nextcloud_amd64_sha "nextcloud@"$nextcloud_arm64_sha "treehouses/nextcloud@"$treehouses_nextcloud__arm64_sha)
-echo $flag
-      pull_image "nextcloud:latest" arm treehouses/nextcloud v7
-      pull_image "nextcloud:latest" amd64 treehouses/nextcloud
-      pull_image "nextcloud:latest" arm64 treehouses/nextcloud
-      deploy_image "treehouses/nextcloud" arm
-      deploy_image "treehouses/nextcloud" arm64
-      deploy_image "treehouses/nextcloud" amd64
-      timetag=$(date +%Y%m%d%H%M)
-      echo $timetag
-      tag1="latest"
-      tag2=$timetag
-      echo $tag2
-      docker inspect treehouses/nextcloud:amd64
-      docker inspect treehouses/nextcloud:arm64
-      docker inspect treehouses/nextcloud:arm
-      create_manifests treehouses/nextcloud $tag1 $tag2 treehouses/nextcloud:amd64 treehouses/nextcloud:arm treehouses/nextcloud:arm64
-      if [[ $flag == true ]]; then
-        docker manifest push treehouses/nextcloud:$tag1; docker manifest push treehouses/nextcloud:$tag2
-      else
-        echo "no changes"
-      fi
+    - name: docker login
+      run: docker login -u ${{ secrets.DOCKERUSERNAME }} -p ${{ secrets.DOCKERAPIKEY }}
+    - name: treehouses alpine
+      run: |
+        export DOCKER_CLI_EXPERIMENTAL=enabled
+        source utils.sh
+        nextcloud_arm_sha=$(get_manifest_sha "nextcloud:latest" "arm" "v7")
+        echo $nextcloud_arm_sha
+        treehouses_nextcloud_arm_sha=$(get_manifest_sha "treehouses/nextcloud:latest" "arm")
+        echo $treehouses_nextcloud_arm_sha
+        flag_arm=$(is_base "nextcloud@"$nextcloud_arm_sha "treehouses/nextcloud@"$treehouses_nextcloud_arm_sha)
+        echo $flag_arm
+        nextcloud_amd64_sha=$(get_manifest_sha "nextcloud:latest" "amd64")
+        echo $nextcloud_amd64_sha
+        treehouses_nextcloud_amd64_sha=$(get_manifest_sha "treehouses/nextcloud:latest" "amd64")
+        echo $treehouses_nextcloud_amd64_sha
+        flag_amd64=$(is_base "nextcloud@"$nextcloud_amd64_sha "treehouses/nextcloud@"$treehouses_nextcloud_amd64_sha)
+        echo $flag_amd64
+        nextcloud_arm64_sha=$(get_manifest_sha "nextcloud:latest" "arm64")
+        echo $nextcloud_arm64_sha
+        treehouses_nextcloud__arm64_sha=$(get_manifest_sha "treehouses/nextcloud:latest" "arm64")
+        echo $treehouses_nextcloud__arm64_sha
+        flag_arm64=$(is_base "nextcloud@"$nextcloud_arm64_sha "treehouses/nextcloud@"$treehouses_nextcloud__arm64_sha)
+        echo $flag_arm64
+        echo $DOCKERAPIKEY | docker login -u "sevenseas" --password-stdin
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        flag=$(compare "nextcloud@"$nextcloud_arm_sha "treehouses/nextcloud@"$treehouses_nextcloud_arm_sha "nextcloud@"$nextcloud_amd64_sha "treehouses/nextcloud@"$treehouses_nextcloud_amd64_sha "nextcloud@"$nextcloud_arm64_sha "treehouses/nextcloud@"$treehouses_nextcloud__arm64_sha)
+        echo $flag
+        pull_image "nextcloud:latest" arm treehouses/nextcloud v7
+        pull_image "nextcloud:latest" amd64 treehouses/nextcloud
+        pull_image "nextcloud:latest" arm64 treehouses/nextcloud
+        deploy_image "treehouses/nextcloud" arm
+        deploy_image "treehouses/nextcloud" arm64
+        deploy_image "treehouses/nextcloud" amd64
+        timetag=$(date +%Y%m%d%H%M)
+        echo $timetag
+        tag1="latest"
+        tag2=$timetag
+        echo $tag2
+        docker inspect treehouses/nextcloud:amd64
+        docker inspect treehouses/nextcloud:arm64
+        docker inspect treehouses/nextcloud:arm
+        create_manifests treehouses/nextcloud $tag1 $tag2 treehouses/nextcloud:amd64 treehouses/nextcloud:arm treehouses/nextcloud:arm64
+        if [[ $flag == true ]]; then
+          docker manifest push treehouses/nextcloud:$tag1; docker manifest push treehouses/nextcloud:$tag2
+        else
+          echo "no changes"
+        fi
