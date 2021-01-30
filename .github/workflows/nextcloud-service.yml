@@ -44,9 +44,9 @@ jobs:
         pull_image "nextcloud:latest" arm treehouses/nextcloud v7
         pull_image "nextcloud:latest" amd64 treehouses/nextcloud
         pull_image "nextcloud:latest" arm64 treehouses/nextcloud
-        deploy_image "treehouses/nextcloud-tags" arm
-        deploy_image "treehouses/nextcloud-tags" arm64
-        deploy_image "treehouses/nextcloud-tags" amd64
+        deploy_image "treehouses/nextcloud" arm
+        deploy_image "treehouses/nextcloud" arm64
+        deploy_image "treehouses/nextcloud" amd64
         timetag=$(date +%Y%m%d%H%M)
         echo $timetag
         tag1="latest"
@@ -55,7 +55,7 @@ jobs:
         docker inspect treehouses/nextcloud:amd64
         docker inspect treehouses/nextcloud:arm64
         docker inspect treehouses/nextcloud:arm
-        create_manifests treehouses/nextcloud $tag1 $tag2 treehouses/nextcloud:amd64 treehouses/nextcloud:arm treehouses/nextcloud:arm64
+        create_manifests treehouses/nextcloud $tag1 $tag2 treehouses/nextcloud-tags:amd64 treehouses/nextcloud-tags:arm treehouses/nextcloud-tags:arm64
         if [[ $flag == true ]]; then
           docker manifest push treehouses/nextcloud:$tag1; docker manifest push treehouses/nextcloud:$tag2
         else
