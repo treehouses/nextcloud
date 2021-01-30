@@ -43,9 +43,6 @@ jobs:
         pull_image "nextcloud:latest" arm treehouses/nextcloud v7
         pull_image "nextcloud:latest" amd64 treehouses/nextcloud
         pull_image "nextcloud:latest" arm64 treehouses/nextcloud
-        deploy_image "treehouses/nextcloud" arm
-        deploy_image "treehouses/nextcloud" arm64
-        deploy_image "treehouses/nextcloud" amd64
         timetag=$(date +%Y%m%d%H%M)
         echo $timetag
         tag1="latest"
